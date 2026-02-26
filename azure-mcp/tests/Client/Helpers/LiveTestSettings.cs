@@ -1,0 +1,15 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
+namespace AzureMcp.Tests.Client.Helpers;
+
+public class LiveTestSettings
+{
+    public string TenantId { get; set; } = string.Empty;
+    public string TenantName { get; set; } = string.Empty;
+    public string SubscriptionId { get; set; } = string.Empty;
+    public string SubscriptionName { get; set; } = string.Empty;
+    public string ResourceGroupName { get; set; } = string.Empty;
+    public string ResourceBaseName { get; set; } = string.Empty;
+    public bool DebugOutput { get; set; }
+}

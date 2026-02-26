@@ -1,0 +1,15 @@
+query GetGraph($schema: String!) {
+  Graph(schema: $schema) {
+    Unit {
+      Name
+      Attributes {
+        Key
+        Value
+      }
+    }
+    Relations {
+      Name
+      Relationship
+    }
+  }
+}

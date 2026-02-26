@@ -1,0 +1,131 @@
+# Copyright 2025 Clidey, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      PGDATA: /data/postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - db
+  mysql:
+    image: mysql
+    environment:
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: mysql
+      MYSQL_ROOT_PASSWORD: password
+    volumes:
+      - mysql:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - db
+  mariadb:
+    image: mariadb
+    environment:
+      MARIADB_USER: user
+      MARIADB_PASSWORD: password
+      MARIADB_DATABASE: mariadb
+      MARIADB_ROOT_PASSWORD: password
+    volumes:
+      - mariadb:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    networks:
+      - db
+  mongo:
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: user
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongo:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - db
+  redis:
+    image: bitnami/redis
+    ports:
+      - '6379:6379'
+    environment:
+      REDIS_PASSWORD: password
+    volumes:
+      - redis:/bitnami
+    networks:
+      - db
+  elasticsearch:
+    container_name: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.1
+    environment:
+      - node.name=elasticsearch
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - ES_JAVA_OPTS=-Xms100m -Xmx100m
+      - xpack.security.enabled=false
+      - ELASTIC_PASSWORD=password
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+  redis_without_password:
+    image: bitnami/redis
+    ports:
+      - '6380:6379'
+    environment:
+      ALLOW_EMPTY_PASSWORD: yes
+    volumes:
+      - redis:/bitnami
+    networks:
+      - db
+  clickhouse:
+    image: clickhouse/clickhouse-server
+    ports:
+      - '8123:8123'
+      - '9000:9000'
+    environment:
+      CLICKHOUSE_USER: user
+      CLICKHOUSE_PASSWORD: password
+      CLICKHOUSE_DB: database
+      CLICKHOUSE_ALWAYS_RUN_INITDB_SCRIPTS: true
+    volumes:
+      - clickhouse:/var/lib/clickhouse
+    networks:
+      - db
+networks:
+  db:
+    driver: bridge
+
+volumes:
+  postgres:
+  mysql:
+  mariadb:
+  mongo:
+  redis:
+  elasticsearch:
+  clickhouse:

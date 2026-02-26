@@ -1,0 +1,12 @@
+bin
+obj
+.dist
+.work
+tests/test-cmds.txt
+.vs
+tests/TestResults
+
+node_modules
+.npmrc
+.testsettings.json
+

@@ -1,0 +1,3 @@
+query GetAIModels($providerId: String, $modelType: String!, $token: String) {
+  AIModel(providerId: $providerId, modelType: $modelType, token: $token)
+}
