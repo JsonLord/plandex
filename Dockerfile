@@ -26,6 +26,9 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
+# Install LiteLLM Proxy dependencies
+RUN pip3 install --no-cache-dir litellm[proxy] uvicorn fastapi
+
 # Install Go 1.23
 RUN wget https://go.dev/dl/go1.23.0.linux-amd64.tar.gz && \
     tar -C /usr/local -xzf go1.23.0.linux-amd64.tar.gz && \

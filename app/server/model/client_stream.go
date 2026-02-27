@@ -44,24 +44,6 @@ func CreateChatCompletionWithInternalStream(
 		req.Model += ":nitro"
 	}
 
-	// Inject MCP Tools
-	mcpManager := GetMcpManager()
-	mcpTools, err := mcpManager.GetAllTools(ctx)
-	if err != nil {
-		log.Printf("Error fetching MCP tools: %v", err)
-	} else if len(mcpTools) > 0 {
-		for _, tool := range mcpTools {
-			req.Tools = append(req.Tools, openai.Tool{
-				Type: openai.ToolTypeFunction,
-				Function: &openai.FunctionDefinition{
-					Name:        tool.Name,
-					Description: tool.Description,
-					Parameters:  tool.InputSchema,
-				},
-			})
-		}
-	}
-
 	// Force streaming mode since we're using the streaming API
 	req.Stream = true
 
@@ -210,56 +192,6 @@ func processChatCompletionStream(
 					if choice.FinishReason == "error" {
 						err = fmt.Errorf("model stopped with error status | The model is not responding.")
 						return accumulator.Result(true, err), err
-					} else if choice.FinishReason == "tool_calls" {
-						// Handle tool calls!
-						// We need to parse the tool calls from the accumulator/choice if available,
-						// but streaming tool calls are tricky. Usually `choice.Delta.ToolCalls` are fragments.
-						// OpenAI library might not fully assemble them in `Delta`.
-						// However, `FinishReason` being `tool_calls` implies completion.
-						// BUT `stream.Recv` returns chunks. We need to have accumulated the tool calls.
-						// The accumulator stores content string. Tool calls are separate.
-						// This current implementation of `StreamCompletionAccumulator` only stores Content string.
-						// We need to upgrade it or handle it here.
-
-						// NOTE: Implementing robust streaming tool execution is complex.
-						// For this task, we will attempt to execute if we detect a complete tool call signature
-						// or if the stream logic supports it.
-						// Given the existing code doesn't seem to have full tool accumulation logic,
-						// we might be limited.
-
-						// Simplification: Check if the last chunk has tool calls.
-						// Realistically, for robust tool use, we need to collect tool call parts.
-
-						// Let's assume for now we just log it or pass it through.
-						// To actually execute, we'd need to intercept, execute, and feed back.
-						// That requires a loop structure (Model -> Tool -> Model).
-						// `processChatCompletionStream` is a single pass.
-						// Changing this to a loop is a significant refactor.
-						//
-						// HOWEVER, the `CreateChatCompletionWithInternalStream` caller might be part of a loop
-						// in `app/server/model/plan/tell.go` or similar.
-						// If we just return the tool call in the response, the higher level logic *should* handle it
-						// IF it supports tool calls.
-						// Checking `ModelResponse` struct...
-
-						// `ModelResponse` has `Content string`. It does NOT have `ToolCalls`.
-						// We must update `ModelResponse` to include tool calls if we want upstream to handle it.
-						// OR we handle it right here (RECURSION).
-
-						// Recursion here is cleaner for "autonomous" behavior.
-						// But `processChatCompletionStream` returns `ModelResponse` which is stream-oriented.
-						// If we execute a tool, we get a result. We then need to send that result back to the model.
-						// The user sees the tool output? Or just the final answer?
-						// Usually: User sees "Thinking..." -> Tool Exec -> Final Answer.
-
-						// Let's TRY to handle it here if possible, or at least prepare the structure.
-						// But since we are modifying `processChatCompletionStream`, we have control.
-
-						// ISSUE: Streaming tool calls come in chunks. We need to aggregate them.
-						// The current `accumulator` only does content.
-
-						streamFinished = true
-						continue
 					} else {
 						// Reset the timer for the usage chunk
 						if !timer.Stop() {
@@ -273,30 +205,6 @@ func processChatCompletionStream(
 
 				if req.Tools != nil {
 					if choice.Delta.ToolCalls != nil {
-						// This is a chunk of a tool call.
-						// We need to accumulate this.
-						// For this PR, extending the accumulator to handle tool calls is out of scope for "simple" integration,
-						// BUT necessary for it to work.
-						// Let's add basic handling: if we see tool calls, we just append to content for now to see what happens?
-						// No, that breaks JSON.
-
-						// We will just let the stream finish. The `accumulator` needs to support ToolCalls.
-						// I will update `StreamCompletionAccumulator` in `types` package first if I can?
-						// I cannot see `app/server/types/message.go` completely but I read it earlier.
-						// `ModelResponse` only has `Content`.
-
-						// Strategy: Treat the MCP tool call execution as a "Post-Processing" step if possible,
-						// OR just inject the tool defs and let the LLM output the JSON in the text (ModelOutputFormatToolCallJson vs Xml).
-						// If `PreferredOutputFormat` is `ModelOutputFormatToolCallJson`, it expects native tool calls.
-						// If `PreferredOutputFormat` is `ModelOutputFormatXml`, it might output text.
-
-						// Given the constraints and the risk of breaking existing stream logic,
-						// I will focus on injecting the tools. If the model uses them, it will appear in the stream.
-						// The backend logic to *execute* them might need to be in the "Plan" logic layer, not the low-level client.
-						// But the plan logic (`model/plan/*.go`) is where the loop happens.
-						// I should verify if I need to touch that.
-						// For now, injecting tools is Step 2.1.
-
 						toolCall := choice.Delta.ToolCalls[0]
 						content = toolCall.Function.Arguments
 					}

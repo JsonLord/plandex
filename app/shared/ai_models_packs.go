@@ -122,30 +122,33 @@ var BuiltInModelPackSchemas = []*ModelPackSchema{
 }
 
 func init() {
-	defaultBuilder := getModelRoleConfig(ModelRoleBuilder, "blablador/alias-code",
-		getStrongModelFallback(ModelRoleBuilder, "blablador/alias-large"),
+	defaultBuilder := getModelRoleConfig(ModelRoleBuilder, "openai/o4-mini-medium",
+		getStrongModelFallback(ModelRoleBuilder, "openai/o4-mini-high"),
 	)
 
-	// Updated DailyDriver to use Blablador models
 	DailyDriverSchema = ModelPackSchema{
 		Name:        "daily-driver",
-		Description: "A mix of models from Blablador balancing large context and speed.",
+		Description: "A mix of models from Anthropic, OpenAI, and Google that balances speed, quality, and cost. Supports up to 2M context.",
 		ModelPackSchemaRoles: ModelPackSchemaRoles{
-			Planner: getModelRoleConfig(ModelRolePlanner, "blablador/alias-huge",
-				getLargeContextFallback(ModelRolePlanner, "blablador/alias-huge"),
+			Planner: getModelRoleConfig(ModelRolePlanner, "anthropic/claude-sonnet-4",
+				getLargeContextFallback(ModelRolePlanner, "google/gemini-2.5-pro",
+					getLargeContextFallback(ModelRolePlanner, "google/gemini-pro-1.5"),
+				),
 			),
-			Architect: Pointer(getModelRoleConfig(ModelRoleArchitect, "blablador/alias-huge",
-				getLargeContextFallback(ModelRoleArchitect, "blablador/alias-huge"),
+			Architect: Pointer(getModelRoleConfig(ModelRoleArchitect, "anthropic/claude-sonnet-4",
+				getLargeContextFallback(ModelRoleArchitect, "google/gemini-2.5-pro",
+					getLargeContextFallback(ModelRoleArchitect, "google/gemini-pro-1.5"),
+				),
 			)),
-			Coder: Pointer(getModelRoleConfig(ModelRoleCoder, "blablador/alias-code",
-				getLargeContextFallback(ModelRoleCoder, "blablador/alias-large"),
+			Coder: Pointer(getModelRoleConfig(ModelRoleCoder, "anthropic/claude-sonnet-4",
+				getLargeContextFallback(ModelRoleCoder, "openai/gpt-4.1"),
 			)),
-			PlanSummary:      getModelRoleConfig(ModelRolePlanSummary, "blablador/alias-fast"),
+			PlanSummary:      getModelRoleConfig(ModelRolePlanSummary, "openai/o4-mini-low"),
 			Builder:          defaultBuilder,
-			WholeFileBuilder: Pointer(getModelRoleConfig(ModelRoleWholeFileBuilder, "blablador/alias-code")),
-			Namer:            getModelRoleConfig(ModelRoleName, "blablador/alias-fast"),
-			CommitMsg:        getModelRoleConfig(ModelRoleCommitMsg, "blablador/alias-fast"),
-			ExecStatus:       getModelRoleConfig(ModelRoleExecStatus, "blablador/alias-fast"),
+			WholeFileBuilder: Pointer(getModelRoleConfig(ModelRoleWholeFileBuilder, "openai/o4-mini-medium")),
+			Namer:            getModelRoleConfig(ModelRoleName, "openai/gpt-4.1-mini"),
+			CommitMsg:        getModelRoleConfig(ModelRoleCommitMsg, "openai/gpt-4.1-mini"),
+			ExecStatus:       getModelRoleConfig(ModelRoleExecStatus, "openai/o4-mini-low"),
 		},
 	}
 
@@ -316,6 +319,24 @@ func init() {
 		Description: "Uses Claude Opus 4 for planning, default models for other roles. Supports up to 180k input context.",
 		ModelPackSchemaRoles: ModelPackSchemaRoles{
 			Planner: getModelRoleConfig(ModelRolePlanner, "anthropic/claude-opus-4"),
+			Coder: Pointer(getModelRoleConfig(ModelRoleCoder, "anthropic/claude-sonnet-4",
+				getLargeContextFallback(ModelRoleCoder, "openai/gpt-4.1"),
+			)),
+			PlanSummary: getModelRoleConfig(ModelRolePlanSummary, "openai/o4-mini-low"),
+			Builder:     defaultBuilder,
+			WholeFileBuilder: Pointer(getModelRoleConfig(ModelRoleWholeFileBuilder,
+				"openai/o4-mini-medium")),
+			Namer:      getModelRoleConfig(ModelRoleName, "openai/gpt-4.1-mini"),
+			CommitMsg:  getModelRoleConfig(ModelRoleCommitMsg, "openai/gpt-4.1-mini"),
+			ExecStatus: getModelRoleConfig(ModelRoleExecStatus, "openai/o4-mini-low"),
+		},
+	}
+
+	O3PlannerSchema = ModelPackSchema{
+		Name:        "o3-planner",
+		Description: "Uses Claude Opus 4 for planning, default models for other roles. Supports up to 180k input context.",
+		ModelPackSchemaRoles: ModelPackSchemaRoles{
+			Planner: getModelRoleConfig(ModelRolePlanner, "anthropic/opus-4"),
 			Coder: Pointer(getModelRoleConfig(ModelRoleCoder, "anthropic/claude-sonnet-4",
 				getLargeContextFallback(ModelRoleCoder, "openai/gpt-4.1"),
 			)),

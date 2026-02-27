@@ -583,58 +583,6 @@ var BuiltInModels = []*BaseModelConfigSchema{
 			{Provider: ModelProviderOpenRouter, ModelName: "perplexity/sonar-reasoning"},
 		},
 	},
-	{
-		ModelTag:    "blablador/alias-huge",
-		Publisher:   ModelPublisherBlablador,
-		Description: "Blablador Alias Huge",
-		BaseModelShared: BaseModelShared{
-			DefaultMaxConvoTokens: 64000, MaxTokens: 200000,
-			MaxOutputTokens: 8192, ReservedOutputTokens: 8192,
-			PreferredOutputFormat: ModelOutputFormatToolCallJson,
-		},
-		Providers: []BaseModelUsesProvider{
-			{Provider: ModelProviderBlablador, ModelName: "alias-huge"},
-		},
-	},
-	{
-		ModelTag:    "blablador/alias-large",
-		Publisher:   ModelPublisherBlablador,
-		Description: "Blablador Alias Large",
-		BaseModelShared: BaseModelShared{
-			DefaultMaxConvoTokens: 32000, MaxTokens: 128000,
-			MaxOutputTokens: 4096, ReservedOutputTokens: 4096,
-			PreferredOutputFormat: ModelOutputFormatToolCallJson,
-		},
-		Providers: []BaseModelUsesProvider{
-			{Provider: ModelProviderBlablador, ModelName: "alias-large"},
-		},
-	},
-	{
-		ModelTag:    "blablador/alias-code",
-		Publisher:   ModelPublisherBlablador,
-		Description: "Blablador Alias Code",
-		BaseModelShared: BaseModelShared{
-			DefaultMaxConvoTokens: 16000, MaxTokens: 64000,
-			MaxOutputTokens: 8192, ReservedOutputTokens: 8192,
-			PreferredOutputFormat: ModelOutputFormatToolCallJson,
-		},
-		Providers: []BaseModelUsesProvider{
-			{Provider: ModelProviderBlablador, ModelName: "alias-code"},
-		},
-	},
-	{
-		ModelTag:    "blablador/alias-fast",
-		Publisher:   ModelPublisherBlablador,
-		Description: "Blablador Alias Fast",
-		BaseModelShared: BaseModelShared{
-			DefaultMaxConvoTokens: 8000, MaxTokens: 32000,
-			MaxOutputTokens: 2048, ReservedOutputTokens: 2048,
-			PreferredOutputFormat: ModelOutputFormatToolCallJson,
-		},
-		Providers: []BaseModelUsesProvider{
-			{Provider: ModelProviderBlablador, ModelName: "alias-fast"},
-		},
-	},
 }
 
 var BuiltInBaseModelsById = map[ModelId]*BaseModelConfigSchema{}
