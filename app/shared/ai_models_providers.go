@@ -7,6 +7,7 @@ import (
 const OpenAIV1BaseUrl = "https://api.openai.com/v1"
 const OpenRouterBaseUrl = "https://openrouter.ai/api/v1"
 const LiteLLMBaseUrl = "http://localhost:4000/v1" // runs in the same container alongside the plandex server
+const BlabladorBaseUrl = "https://api.helmholtz-blablador.fz-juelich.de/v1"
 
 const OpenAIEnvVar = "OPENAI_API_KEY"
 const OpenRouterApiKeyEnvVar = "OPENROUTER_API_KEY"
@@ -15,6 +16,7 @@ const GoogleAIStudioApiKeyEnvVar = "GEMINI_API_KEY"
 const AzureOpenAIEnvVar = "AZURE_OPENAI_API_KEY"
 const DeepSeekApiKeyEnvVar = "DEEPSEEK_API_KEY"
 const PerplexityApiKeyEnvVar = "PERPLEXITY_API_KEY"
+const BlabladorApiKeyEnvVar = "BLABLADOR_API_KEY"
 
 // not set directly via env vars, but used for auth var resolution
 const AnthropicClaudeMaxTokenEnvVar = "ANTHROPIC_CLAUDE_MAX_TOKEN"
@@ -31,6 +33,7 @@ const (
 	ModelPublisherPerplexity ModelPublisher = "Perplexity"
 	ModelPublisherQwen       ModelPublisher = "Qwen"
 	ModelPublisherMistral    ModelPublisher = "Mistral"
+	ModelPublisherBlablador  ModelPublisher = "Blablador"
 )
 
 type ModelProvider string
@@ -52,6 +55,7 @@ const (
 	ModelProviderOllama ModelProvider = "ollama"
 
 	ModelProviderCustom ModelProvider = "custom"
+	ModelProviderBlablador ModelProvider = "blablador"
 )
 
 var ModelProviderToLiteLLMId = map[ModelProvider]string{
@@ -74,6 +78,7 @@ var AllModelProviders = []ModelProvider{
 	ModelProviderPerplexity,
 	ModelProviderOllama,
 	ModelProviderCustom,
+	ModelProviderBlablador,
 }
 
 type ModelProviderExtraAuthVars struct {
@@ -215,6 +220,11 @@ var BuiltInModelProviderConfigs = map[ModelProvider]ModelProviderConfigSchema{
 		BaseUrl:   LiteLLMBaseUrl,
 		SkipAuth:  true,
 		LocalOnly: true,
+	},
+	ModelProviderBlablador: {
+		Provider:     ModelProviderBlablador,
+		BaseUrl:      BlabladorBaseUrl, // Use direct URL as it is OpenAI compatible
+		ApiKeyEnvVar: BlabladorApiKeyEnvVar,
 	},
 }
 
