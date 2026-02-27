@@ -70,8 +70,9 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # --- Final Setup ---
 WORKDIR /app
-ENV MCP_WHODB_HOST=localhost:8080
-ENV DATABASE_URL="postgres://plandex:plandex@localhost:5432/plandex?sslmode=disable"
+# Set environment variables "already" via localhost as requested
+ENV MCP_WHODB_HOST=127.0.0.1:8080
+ENV DATABASE_URL="postgres://plandex:plandex@127.0.0.1:5432/plandex?sslmode=disable"
 # Expose Plandex Server Port
 EXPOSE 8080
 

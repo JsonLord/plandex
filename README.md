@@ -21,7 +21,9 @@ Set the following secrets in the Space settings:
 ## Architecture
 
 * **Single Container**: Runs Plandex Server (Go), WhoDB MCP Server (.NET 8), and PostgreSQL.
-* **WhoDB MCP**: Exposes Azure SQL tools (`get_db_schema`, `execute_sql_query`) to the agent via local TCP (port 8080).
+* **Internal Connections**:
+    * **WhoDB MCP**: Configured to `127.0.0.1:8080` (TCP/Socat).
+    * **Database**: Configured to `postgres://plandex:plandex@127.0.0.1:5432/plandex`.
 * **LLM**: Defaults to `blablador/alias-large` for reasoning and `blablador/alias-huge` for investigation.
 
 ## Usage
