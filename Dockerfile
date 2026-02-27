@@ -41,6 +41,8 @@ WORKDIR /app
 # --- Build .NET Metadata Fetcher ---
 COPY app/mcp-servers/whodb /app/mcp-servers/whodb
 WORKDIR /app/mcp-servers/whodb
+# FORCE REMOVAL of Program.cs if it exists to avoid duplicate entry points
+RUN rm -f Program.cs
 RUN dotnet publish -c Release -o /app/bin/whodb MetadataFetcher.csproj
 
 # --- Setup Python/SQLite MCP Bridge ---
