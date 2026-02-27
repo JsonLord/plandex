@@ -14,9 +14,31 @@ import (
 	"github.com/gorilla/mux"
 )
 
+func logEnvVarPresence(key string) {
+	val := os.Getenv(key)
+	if val != "" {
+		// Log masked value for security (first 4 chars)
+		masked := val
+		if len(val) > 4 {
+			masked = val[:4] + "..."
+		}
+		log.Printf("Environment variable %s is SET (starts with: %s)", key, masked)
+	} else {
+		log.Printf("Environment variable %s is NOT SET", key)
+	}
+}
+
 func main() {
 	// Configure the default logger to include milliseconds in timestamps
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds | log.Lshortfile)
+
+	// Verify critical environment variables
+	log.Println("--- Verifying Environment Variables ---")
+	logEnvVarPresence("BLABLADOR_API_KEY")
+	logEnvVarPresence("MCP_WHODB_HOST")
+	logEnvVarPresence("DATABASE_URL")
+	logEnvVarPresence("OLLAMA_BASE_URL")
+	log.Println("---------------------------------------")
 
 	routes.RegisterHandlePlandex(func(router *mux.Router, path string, isStreaming bool, handler routes.PlandexHandler) *mux.Route {
 		return router.HandleFunc(path, handler)
