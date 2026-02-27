@@ -123,7 +123,7 @@ var BuiltInModelPackSchemas = []*ModelPackSchema{
 
 func init() {
 	defaultBuilder := getModelRoleConfig(ModelRoleBuilder, "blablador/alias-large",
-		getStrongModelFallback(ModelRoleBuilder, "blablador/alias-large"),
+		getStrongModelFallback(ModelRoleBuilder, "blablador/alias-huge"),
 	)
 
 	// Updated DailyDriver to use Blablador models
@@ -131,11 +131,11 @@ func init() {
 		Name:        "daily-driver",
 		Description: "A mix of models from Blablador balancing large context and speed.",
 		ModelPackSchemaRoles: ModelPackSchemaRoles{
-			Planner: getModelRoleConfig(ModelRolePlanner, "blablador/alias-large",
-				getLargeContextFallback(ModelRolePlanner, "blablador/alias-large"),
+			Planner: getModelRoleConfig(ModelRolePlanner, "blablador/alias-huge",
+				getLargeContextFallback(ModelRolePlanner, "blablador/alias-huge"),
 			),
-			Architect: Pointer(getModelRoleConfig(ModelRoleArchitect, "blablador/alias-large",
-				getLargeContextFallback(ModelRoleArchitect, "blablador/alias-large"),
+			Architect: Pointer(getModelRoleConfig(ModelRoleArchitect, "blablador/alias-huge",
+				getLargeContextFallback(ModelRoleArchitect, "blablador/alias-huge"),
 			)),
 			Coder: Pointer(getModelRoleConfig(ModelRoleCoder, "blablador/alias-large",
 				getLargeContextFallback(ModelRoleCoder, "blablador/alias-large"),
