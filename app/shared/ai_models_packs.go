@@ -122,8 +122,8 @@ var BuiltInModelPackSchemas = []*ModelPackSchema{
 }
 
 func init() {
-	defaultBuilder := getModelRoleConfig(ModelRoleBuilder, "blablador/alias-large",
-		getStrongModelFallback(ModelRoleBuilder, "blablador/alias-huge"),
+	defaultBuilder := getModelRoleConfig(ModelRoleBuilder, "blablador/alias-code",
+		getStrongModelFallback(ModelRoleBuilder, "blablador/alias-large"),
 	)
 
 	// Updated DailyDriver to use Blablador models
@@ -137,12 +137,12 @@ func init() {
 			Architect: Pointer(getModelRoleConfig(ModelRoleArchitect, "blablador/alias-huge",
 				getLargeContextFallback(ModelRoleArchitect, "blablador/alias-huge"),
 			)),
-			Coder: Pointer(getModelRoleConfig(ModelRoleCoder, "blablador/alias-large",
+			Coder: Pointer(getModelRoleConfig(ModelRoleCoder, "blablador/alias-code",
 				getLargeContextFallback(ModelRoleCoder, "blablador/alias-large"),
 			)),
 			PlanSummary:      getModelRoleConfig(ModelRolePlanSummary, "blablador/alias-fast"),
 			Builder:          defaultBuilder,
-			WholeFileBuilder: Pointer(getModelRoleConfig(ModelRoleWholeFileBuilder, "blablador/alias-large")),
+			WholeFileBuilder: Pointer(getModelRoleConfig(ModelRoleWholeFileBuilder, "blablador/alias-code")),
 			Namer:            getModelRoleConfig(ModelRoleName, "blablador/alias-fast"),
 			CommitMsg:        getModelRoleConfig(ModelRoleCommitMsg, "blablador/alias-fast"),
 			ExecStatus:       getModelRoleConfig(ModelRoleExecStatus, "blablador/alias-fast"),

@@ -610,6 +610,19 @@ var BuiltInModels = []*BaseModelConfigSchema{
 		},
 	},
 	{
+		ModelTag:    "blablador/alias-code",
+		Publisher:   ModelPublisherBlablador,
+		Description: "Blablador Alias Code",
+		BaseModelShared: BaseModelShared{
+			DefaultMaxConvoTokens: 16000, MaxTokens: 64000,
+			MaxOutputTokens: 8192, ReservedOutputTokens: 8192,
+			PreferredOutputFormat: ModelOutputFormatToolCallJson,
+		},
+		Providers: []BaseModelUsesProvider{
+			{Provider: ModelProviderBlablador, ModelName: "alias-code"},
+		},
+	},
+	{
 		ModelTag:    "blablador/alias-fast",
 		Publisher:   ModelPublisherBlablador,
 		Description: "Blablador Alias Fast",
