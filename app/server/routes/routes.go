@@ -98,6 +98,8 @@ func addApiRoutes(r *mux.Router, prefix string) {
 	// API Endpoints for UI
 	r.HandleFunc("/api/sync_metadata", SyncMetadataHandler).Methods("POST")
 	r.HandleFunc("/api/chat", ChatHandler).Methods("POST")
+	r.HandleFunc("/api/settings_status", handlers.GetSettingsStatusHandler).Methods("GET")
+	r.HandleFunc("/api/settings_update", handlers.UpdateSettingsHandler).Methods("POST")
 
 	HandlePlandexFn(r, prefix+"/accounts/email_verifications", false, handlers.CreateEmailVerificationHandler).Methods("POST")
 	HandlePlandexFn(r, prefix+"/accounts/email_verifications/check_pin", false, handlers.CheckEmailPinHandler).Methods("POST")
