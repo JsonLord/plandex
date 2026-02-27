@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plandex Agent Interface</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .controls { display: flex; gap: 20px; margin-bottom: 20px; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+        #chat-window { width: 80%; height: 400px; border: 1px solid #ccc; overflow-y: scroll; padding: 10px; margin-bottom: 20px; }
+        #input-area { display: flex; width: 80%; gap: 10px; }
+        #user-input { flex-grow: 1; padding: 10px; }
+        .message { margin: 5px 0; }
+        .user-msg { color: blue; }
+        .agent-msg { color: green; }
+        .system-msg { color: gray; font-style: italic; }
+    </style>
+</head>
+<body>
+    <h1>Plandex Agent Interface</h1>
+
+    <div class="controls">
+        <button onclick="startChat('data')">Start Data Chat</button>
+        <button onclick="startChat('powerbi')">Start Power BI Chat</button>
+        <button onclick="syncDatabase()">Synchronize DB Metadata</button>
+    </div>
+
+    <div id="chat-window"></div>
+
+    <div id="input-area">
+        <input type="text" id="user-input" placeholder="Type your message..." onkeypress="handleKeyPress(event)">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        let currentMode = null;
+
+        function appendMessage(sender, text, type) {
+            const div = document.createElement('div');
+            div.className = `message ${type}`;
+            div.textContent = `${sender}: ${text}`;
+            document.getElementById('chat-window').appendChild(div);
+            document.getElementById('chat-window').scrollTop = document.getElementById('chat-window').scrollHeight;
+        }
+
+        async function startChat(mode) {
+            currentMode = mode;
+            document.getElementById('chat-window').innerHTML = '';
+            appendMessage('System', `Starting chat in ${mode} mode...`, 'system-msg');
+
+            // In a real implementation, this would call the backend to init a session
+            // For now, we simulate the prompt setting
+            if (mode === 'data') {
+                appendMessage('Agent', 'I am ready to help you with Database queries. I can access the WhoDB schema.', 'agent-msg');
+            } else {
+                appendMessage('Agent', 'I am ready to help you with Power BI reports.', 'agent-msg');
+            }
+        }
+
+        async function syncDatabase() {
+            appendMessage('System', 'Synchronizing database metadata...', 'system-msg');
+            try {
+                const response = await fetch('/api/sync_metadata', { method: 'POST' });
+                const result = await response.json();
+                if (response.ok) {
+                    appendMessage('System', `Sync complete: ${result.message}`, 'system-msg');
+                } else {
+                    appendMessage('System', `Sync failed: ${result.error}`, 'system-msg');
+                }
+            } catch (e) {
+                appendMessage('System', `Sync error: ${e.message}`, 'system-msg');
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('user-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            appendMessage('You', text, 'user-msg');
+            input.value = '';
+
+            // Call backend chat endpoint
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text, mode: currentMode })
+                });
+                // Stream response handling would go here
+                const result = await response.json();
+                appendMessage('Agent', result.reply, 'agent-msg');
+            } catch (e) {
+                appendMessage('System', `Error: ${e.message}`, 'system-msg');
+            }
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') sendMessage();
+        }
+    </script>
+</body>
+</html>
