@@ -37,7 +37,7 @@ func GetSettingsStatusHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(status)
 }
 
-func UpdateSettingsHandler(w http.ResponseWriter, r *http.Request) {
+func UpdateEnvironmentSettingsHandler(w http.ResponseWriter, r *http.Request) {
 	var req map[string]string
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)

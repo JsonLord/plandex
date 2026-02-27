@@ -18,7 +18,6 @@ Set the following secrets in the Space settings:
 
 * `BLABLADOR_API_KEY`: API Key for Blablador LLM.
 * `AZURE_SQL_CONNECTION_STRING`: Connection string for metadata sync (ADO.NET format).
-    * **Example Format**: `Server=tcp:svr-datev-saxess.database.windows.net,1433;Initial Catalog=datev-saxess;Persist Security Info=False;User ID=xuadmin;Password={your_password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;`
 * `POWERBI_CLIENT_ID`: Power BI Client ID (optional for mock).
 * `POWERBI_SECRET`: Power BI Client Secret (optional for mock).
 * `OPENAI_API_KEY` (Optional): Fallback.
@@ -35,6 +34,5 @@ Set the following secrets in the Space settings:
 ## Usage
 
 1. **Interface**: Access the UI to start a "Data" or "Power BI" chat.
-2. **Settings**: Click "Settings" to verify or update environment variables (keys, connection strings) at runtime.
-3. **Sync**: Click "Synchronize DB Metadata" to fetch the schema from Azure SQL into the local cache.
-4. **Chat**: Ask the agent to query the database or list Power BI dashboards.
+2. **Sync**: Click "Synchronize DB Metadata" to fetch the schema from Azure SQL into the local cache.
+3. **Chat**: Ask the agent to query the database or list Power BI dashboards.
