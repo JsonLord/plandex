@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"plandex-server/handlers"
 	"plandex-server/hooks"
-	"plandex-server/mcp"
 	"plandex-server/model"
 
 	"github.com/gorilla/mux"
