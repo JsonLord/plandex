@@ -12,6 +12,17 @@ services:
       - plandex-db:/var/lib/postgresql/data
     networks:
       - plandex-network
+
+  whodb-mcp:
+    build:
+      context: ./mcp-servers/whodb
+      dockerfile: Dockerfile
+    # Expose TCP port for Plandex to connect
+    ports:
+      - "8080:8080"
+    networks:
+      - plandex-network
+
   plandex-server:
     image: plandexai/plandex-server:latest
     # build:
@@ -28,6 +39,8 @@ services:
       LOCAL_MODE: 1
       PLANDEX_BASE_DIR: /plandex-server
       OLLAMA_BASE_URL: http://host.docker.internal:11434
+      # Configure MCP
+      MCP_WHODB_HOST: whodb-mcp:8080
       
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -35,6 +48,7 @@ services:
       - plandex-network
     depends_on:
       - plandex-postgres
+      - whodb-mcp
     command: [ "/bin/sh", "-c", "/scripts/wait-for-it.sh plandex-postgres:5432 -- ./plandex-server" ]
 
 networks:
