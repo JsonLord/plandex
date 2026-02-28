@@ -21,10 +21,11 @@
         .modal-content { background: white; padding: 20px; border-radius: 5px; width: 50%; display: flex; flex-direction: column; gap: 15px; }
         .modal-content input { padding: 8px; font-size: 14px; width: 100%; box-sizing: border-box; }
         .status-badge { font-weight: bold; margin-left: 10px; font-size: 0.9em; }
-        .set { color: green; }
-        .not-set { color: red; }
+        .set { color: #2e7d32; background-color: #e8f5e9; padding: 4px 8px; border-radius: 4px; }
+        .not-set { color: #c62828; background-color: #ffebee; padding: 4px 8px; border-radius: 4px; }
         .setting-row { display: flex; flex-direction: column; gap: 5px; }
         .setting-header { display: flex; justify-content: space-between; align-items: center; }
+        .override-text { font-size: 0.8em; color: #666; font-style: italic; }
     </style>
 </head>
 <body>
@@ -48,14 +49,14 @@
     <div id="settings-modal" class="modal">
         <div class="modal-content">
             <h2>Environment Settings</h2>
-            <p style="font-size: 0.9em; color: #666;">These settings override environment variables for the current session.</p>
+            <p style="font-size: 0.9em; color: #666;">View current Space secrets or override them for this session.</p>
 
             <div class="setting-row">
                 <div class="setting-header">
                     <label>Blablador API Key:</label>
                     <span id="status-blablador" class="status-badge">Checking...</span>
                 </div>
-                <input type="password" id="input-blablador" placeholder="Enter new value">
+                <input type="password" id="input-blablador" placeholder="Enter to override existing secret">
             </div>
 
             <div class="setting-row">
@@ -71,7 +72,7 @@
                     <label>Power BI Client ID:</label>
                     <span id="status-powerbi" class="status-badge">Checking...</span>
                 </div>
-                <input type="text" id="input-powerbi" placeholder="Enter new value">
+                <input type="text" id="input-powerbi" placeholder="Enter to override existing secret">
             </div>
 
             <div class="setting-row">
@@ -79,7 +80,7 @@
                     <label>OpenAI API Key (Fallback):</label>
                     <span id="status-openai" class="status-badge">Checking...</span>
                 </div>
-                <input type="password" id="input-openai" placeholder="Enter new value">
+                <input type="password" id="input-openai" placeholder="Enter to override existing secret">
             </div>
 
             <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px;">
@@ -174,11 +175,11 @@
             }
         }
 
-        function updateStatus(id, val) {
+        function updateStatus(id, statusObj) {
             const el = document.getElementById(id);
             if (el) {
-                el.textContent = val;
-                el.className = 'status-badge ' + (val === 'NOT SET' ? 'not-set' : 'set');
+                el.textContent = statusObj.message;
+                el.className = 'status-badge ' + (statusObj.is_set ? 'set' : 'not-set');
             }
         }
 

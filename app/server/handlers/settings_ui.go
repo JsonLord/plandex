@@ -7,22 +7,34 @@ import (
 	"os"
 )
 
-type SettingsStatusResponse struct {
-	BlabladorApiKey string `json:"BLABLADOR_API_KEY"`
-	AzureSqlConn    string `json:"AZURE_SQL_CONNECTION_STRING"`
-	PowerBiClientId string `json:"POWERBI_CLIENT_ID"`
-	OpenAiApiKey    string `json:"OPENAI_API_KEY"`
+type SettingStatus struct {
+	IsSet   bool   `json:"is_set"`
+	Message string `json:"message"`
 }
 
-func getStatus(key string) string {
+type SettingsStatusResponse struct {
+	BlabladorApiKey SettingStatus `json:"BLABLADOR_API_KEY"`
+	AzureSqlConn    SettingStatus `json:"AZURE_SQL_CONNECTION_STRING"`
+	PowerBiClientId SettingStatus `json:"POWERBI_CLIENT_ID"`
+	OpenAiApiKey    SettingStatus `json:"OPENAI_API_KEY"`
+}
+
+func getStatus(key string) SettingStatus {
 	val := os.Getenv(key)
 	if val != "" {
+		preview := ""
 		if len(val) > 4 {
-			return "SET (starts with " + val[:4] + "...)"
+			preview = " (starts with " + val[:4] + "...)"
 		}
-		return "SET"
+		return SettingStatus{
+			IsSet:   true,
+			Message: "✅ Configured via Space Secrets" + preview,
+		}
 	}
-	return "NOT SET"
+	return SettingStatus{
+		IsSet:   false,
+		Message: "❌ Not Set",
+	}
 }
 
 func GetSettingsStatusHandler(w http.ResponseWriter, r *http.Request) {
