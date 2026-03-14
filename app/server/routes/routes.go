@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -8,6 +9,7 @@ import (
 	"path/filepath"
 	"plandex-server/handlers"
 	"plandex-server/hooks"
+	"plandex-server/model"
 
 	"github.com/gorilla/mux"
 )
@@ -88,6 +90,16 @@ func AddProxyableApiRoutesWithPrefix(r *mux.Router, prefix string) {
 
 func addApiRoutes(r *mux.Router, prefix string) {
 	EnsureHandlePlandex()
+
+	// Static UI Route
+	r.PathPrefix("/ui").Handler(http.StripPrefix("/ui", http.FileServer(http.Dir("/app/src/server/static"))))
+	r.Handle("/", http.RedirectHandler("/ui/index.html", http.StatusFound))
+
+	// API Endpoints for UI
+	r.HandleFunc("/api/sync_metadata", SyncMetadataHandler).Methods("POST")
+	r.HandleFunc("/api/chat", ChatHandler).Methods("POST")
+	r.HandleFunc("/api/settings_status", handlers.GetSettingsStatusHandler).Methods("GET")
+	r.HandleFunc("/api/settings_update", handlers.UpdateEnvironmentSettingsHandler).Methods("POST")
 
 	HandlePlandexFn(r, prefix+"/accounts/email_verifications", false, handlers.CreateEmailVerificationHandler).Methods("POST")
 	HandlePlandexFn(r, prefix+"/accounts/email_verifications/check_pin", false, handlers.CheckEmailPinHandler).Methods("POST")
@@ -200,4 +212,48 @@ func addProxyableApiRoutes(r *mux.Router, prefix string) {
 	HandlePlandexFn(r, prefix+"/plans/{planId}/{branch}/auto_load_context", false, handlers.AutoLoadContextHandler).Methods("POST")
 
 	HandlePlandexFn(r, prefix+"/plans/{planId}/{branch}/build_status", false, handlers.GetBuildStatusHandler).Methods("GET")
+}
+
+// Minimal handlers for the UI
+func SyncMetadataHandler(w http.ResponseWriter, r *http.Request) {
+	mcpManager := model.GetMcpManager()
+
+	// We assume 'whodb' client is registered (which is actually the sqlite-mcp bridge)
+	// We need to call 'refresh_metadata' tool
+	// We grab the connection string from Env for now
+	// In production this should come from a secure store or the request
+	// But per instructions: "from the hugging face secrets" which are Envs
+	connStr := os.Getenv("AZURE_SQL_CONNECTION_STRING") // We need to add this secret
+	if connStr == "" {
+		http.Error(w, `{"error": "AZURE_SQL_CONNECTION_STRING not set"}`, http.StatusBadRequest)
+		return
+	}
+
+	res, err := mcpManager.ExecuteTool(r.Context(), "refresh_metadata", map[string]interface{}{
+		"connection_string": connStr,
+	})
+
+	w.Header().Set("Content-Type", "application/json")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	json.NewEncoder(w).Encode(map[string]interface{}{"message": "Success", "details": res.Content})
+}
+
+func ChatHandler(w http.ResponseWriter, r *http.Request) {
+	// Placeholder for chat logic
+	// Ideally calls model.CreateChatCompletion...
+	// For MVP UI, just echo
+	var req struct {
+		Message string `json:"message"`
+		Mode    string `json:"mode"`
+	}
+	json.NewDecoder(r.Body).Decode(&req)
+
+	reply := fmt.Sprintf("I received your %s query: %s. (Backend integration pending)", req.Mode, req.Message)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{"reply": reply})
 }
